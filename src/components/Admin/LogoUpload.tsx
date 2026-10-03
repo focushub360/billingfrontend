@@ -8,7 +8,7 @@ const getApiBaseUrl = () => {
     import.meta.env.VITE_API_BASE_URL ||
     (import.meta.env.DEV
       ? "/api" // Use Vite proxy in development
-      : "https://backend-billingsoftware.onrender.com/api")
+      : "https://billingbackend-gyd9.onrender.com/api")
   ); // Production backend URL
 };
 

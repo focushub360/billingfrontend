@@ -6,7 +6,7 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   (import.meta.env.DEV
     ? "/api" // Use Vite proxy in development
-    : "https://backend-billingsoftware.onrender.com/api"); // Production backend URL fallback
+    : "https://billingbackend-gyd9.onrender.com/api"); // Production backend URL fallback
 
 // Debug logging
 console.log("Environment:", import.meta.env.DEV ? "development" : "production");
