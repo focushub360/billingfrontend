@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========================================================
+   GLOBAL WEBSITE SCALE CONFIGURATION (90% View)
+   You can easily change `--app-scale` to 1, 0.95, 0.85, etc.
+   ======================================================== */
+:root {
+  --app-scale: 0.90;
+}
+
+html, body {
+  zoom: var(--app-scale);
+  /* Fallback for browsers without CSS zoom property support */
+  @supports not (zoom: 0.9) {
+    font-size: 90%;
+  }
+}
+
 @layer utilities {
   .line-clamp-1 {
     overflow: hidden;

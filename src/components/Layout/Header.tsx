@@ -1,4 +1,4 @@
-import { User, Moon, Sun, Menu, X } from "lucide-react";
+import { User, Moon, Sun, Menu, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth.tsx";
 import { useTheme } from "../../hooks/useTheme.tsx";
 import { colors, themeConfig } from "../../theme/colors";
@@ -6,21 +6,30 @@ import { colors, themeConfig } from "../../theme/colors";
 interface HeaderProps {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
+  isCollapsed?: boolean;
+  toggleCollapse?: () => void;
 }
 
-export const Header = ({ isSidebarOpen, toggleSidebar }: HeaderProps) => {
+export const Header = ({
+  isSidebarOpen,
+  toggleSidebar,
+  isCollapsed,
+  toggleCollapse,
+}: HeaderProps) => {
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 w-full">
+    <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 w-full sticky top-0 z-30">
       <div className="mx-auto px-2 sm:px-4 lg:px-8 max-w-full">
         <div className="flex justify-between items-center h-14 sm:h-16">
           {/* Left section - Logo and menu toggle */}
           <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
+            {/* Mobile menu toggle */}
             <button
               onClick={toggleSidebar}
               className="lg:hidden p-1.5 sm:p-2 rounded-md text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+              title="Toggle Mobile Menu"
             >
               {isSidebarOpen ? (
                 <X size={20} className="sm:w-6 sm:h-6" />
@@ -28,6 +37,21 @@ export const Header = ({ isSidebarOpen, toggleSidebar }: HeaderProps) => {
                 <Menu size={20} className="sm:w-6 sm:h-6" />
               )}
             </button>
+
+            {/* Desktop collapse toggle */}
+            {toggleCollapse && (
+              <button
+                onClick={toggleCollapse}
+                className="hidden lg:flex p-1.5 sm:p-2 rounded-lg text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+              >
+                {isCollapsed ? (
+                  <ChevronRight size={20} />
+                ) : (
+                  <ChevronLeft size={20} />
+                )}
+              </button>
+            )}
 
             <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
               <div

@@ -8,6 +8,7 @@ import {
   TrendingUp,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   Plus,
   List,
   Eye,
@@ -28,6 +29,8 @@ import { useLogo } from "../../hooks/useLogo";
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  isCollapsed?: boolean;
+  toggleCollapse?: () => void;
 }
 
 const menuItems = [
@@ -121,7 +124,12 @@ const menuItems = [
   },
 ];
 
-export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
+export const Sidebar = ({
+  isOpen,
+  onClose,
+  isCollapsed = false,
+  toggleCollapse,
+}: SidebarProps) => {
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
   const [manuallyToggledMenus, setManuallyToggledMenus] = useState<Set<string>>(
     new Set()
@@ -239,10 +247,17 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         <button
           key={item.action}
           onClick={() => handleMenuAction(item.action)}
-          className="w-full flex items-center space-x-2 sm:space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+          title={isCollapsed ? item.label : undefined}
+          className={`w-full flex items-center ${
+            isCollapsed
+              ? "justify-center lg:justify-center px-2"
+              : "space-x-2 sm:space-x-3 px-3 sm:px-4"
+          } py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700`}
         >
           <item.icon size={18} className="sm:w-5 sm:h-5 flex-shrink-0" />
-          <span className="truncate">{item.label}</span>
+          <span className={`truncate ${isCollapsed ? "lg:hidden" : ""}`}>
+            {item.label}
+          </span>
         </button>
       );
     }
@@ -252,8 +267,13 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         <NavLink
           key={item.path}
           to={item.path}
+          title={isCollapsed ? item.label : undefined}
           className={({ isActive }) =>
-            `flex items-center space-x-2 sm:space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-colors ${
+            `flex items-center ${
+              isCollapsed
+                ? "justify-center lg:justify-center px-2"
+                : "space-x-2 sm:space-x-3 px-3 sm:px-4"
+            } py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-colors ${
               isActive
                 ? "text-white shadow-md"
                 : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -265,7 +285,9 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           onClick={() => window.innerWidth < 1024 && onClose()}
         >
           <item.icon size={18} className="sm:w-5 sm:h-5 flex-shrink-0" />
-          <span className="truncate">{item.label}</span>
+          <span className={`truncate ${isCollapsed ? "lg:hidden" : ""}`}>
+            {item.label}
+          </span>
         </NavLink>
       );
     }
@@ -275,22 +297,47 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     return (
       <div key={item.id || index}>
         <button
-          onClick={() => toggleSubmenu(item.id || item.label)}
-          className="w-full flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          onClick={() => {
+            if (isCollapsed && toggleCollapse) {
+              toggleCollapse();
+            }
+            toggleSubmenu(item.id || item.label);
+          }}
+          title={isCollapsed ? item.label : undefined}
+          className={`w-full flex items-center ${
+            isCollapsed
+              ? "justify-center lg:justify-center px-2"
+              : "justify-between px-3 sm:px-4"
+          } py-2.5 sm:py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors`}
         >
-          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+          <div
+            className={`flex items-center ${
+              isCollapsed
+                ? "justify-center"
+                : "space-x-2 sm:space-x-3 min-w-0 flex-1"
+            }`}
+          >
             <item.icon size={18} className="sm:w-5 sm:h-5 flex-shrink-0" />
-            <span className="truncate">{item.label}</span>
+            <span className={`truncate ${isCollapsed ? "lg:hidden" : ""}`}>
+              {item.label}
+            </span>
           </div>
-          {isExpanded ? (
-            <ChevronDown size={14} className="sm:w-4 sm:h-4 flex-shrink-0" />
-          ) : (
-            <ChevronRight size={14} className="sm:w-4 sm:h-4 flex-shrink-0" />
-          )}
+          {!isCollapsed &&
+            (isExpanded ? (
+              <ChevronDown size={14} className="sm:w-4 sm:h-4 flex-shrink-0" />
+            ) : (
+              <ChevronRight size={14} className="sm:w-4 sm:h-4 flex-shrink-0" />
+            ))}
         </button>
 
         {isExpanded && (
-          <div className="ml-4 sm:ml-6 mt-1 space-y-1">
+          <div
+            className={`${
+              isCollapsed
+                ? "ml-0 space-y-1 my-1"
+                : "ml-4 sm:ml-6 mt-1 space-y-1"
+            }`}
+          >
             {item.submenu.map((subItem: any, subIndex: number) => {
               if (subItem.path) {
                 // Construct the full path with search params if needed
@@ -305,7 +352,12 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     key={`${subItem.path}-${subItem.search || ""}-${subIndex}`}
                     to={fullPath}
                     state={subItem.state}
-                    className={`flex items-center space-x-2 sm:space-x-3 px-3 sm:px-4 py-2 text-sm rounded-lg transition-colors ${
+                    title={isCollapsed ? subItem.label : undefined}
+                    className={`flex items-center ${
+                      isCollapsed
+                        ? "justify-center lg:justify-center px-2"
+                        : "space-x-2 sm:space-x-3 px-3 sm:px-4"
+                    } py-2 text-sm rounded-lg transition-colors ${
                       isActive
                         ? "text-white shadow-sm"
                         : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -321,7 +373,11 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                       size={14}
                       className="sm:w-4 sm:h-4 flex-shrink-0"
                     />
-                    <span className="truncate">{subItem.label}</span>
+                    <span
+                      className={`truncate ${isCollapsed ? "lg:hidden" : ""}`}
+                    >
+                      {subItem.label}
+                    </span>
                   </NavLink>
                 );
               } else if (subItem.action) {
@@ -329,13 +385,22 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                   <button
                     key={subItem.action}
                     onClick={() => handleMenuAction(subItem.action)}
-                    className="w-full flex items-center space-x-2 sm:space-x-3 px-3 sm:px-4 py-2 text-sm rounded-lg transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    title={isCollapsed ? subItem.label : undefined}
+                    className={`w-full flex items-center ${
+                      isCollapsed
+                        ? "justify-center lg:justify-center px-2"
+                        : "space-x-2 sm:space-x-3 px-3 sm:px-4"
+                    } py-2 text-sm rounded-lg transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700`}
                   >
                     <subItem.icon
                       size={14}
                       className="sm:w-4 sm:h-4 flex-shrink-0"
                     />
-                    <span className="truncate">{subItem.label}</span>
+                    <span
+                      className={`truncate ${isCollapsed ? "lg:hidden" : ""}`}
+                    >
+                      {subItem.label}
+                    </span>
                   </button>
                 );
               }
@@ -359,14 +424,18 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out lg:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } w-80 lg:w-80`}
+        } ${isCollapsed ? "w-80 lg:w-20" : "w-80 lg:w-80"}`}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div
+              className={`flex items-center space-x-2 sm:space-x-3 min-w-0 ${
+                isCollapsed ? "lg:justify-center w-full" : ""
+              }`}
+            >
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center text-white font-bold text-base sm:text-lg flex-shrink-0 overflow-hidden">
                 {hasLogo && logoUrl && !logoLoading ? (
                   <img
@@ -393,7 +462,9 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                   </div>
                 )}
               </div>
-              <div className="min-w-0 flex-1">
+              <div
+                className={`min-w-0 flex-1 ${isCollapsed ? "lg:hidden" : ""}`}
+              >
                 <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate">
                   Pawn Shop
                 </h2>
@@ -402,6 +473,19 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                 </p>
               </div>
             </div>
+
+            {/* Collapse button inside sidebar header */}
+            {toggleCollapse && (
+              <button
+                onClick={toggleCollapse}
+                className={`hidden lg:flex p-1.5 rounded-lg text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                  isCollapsed ? "lg:hidden" : ""
+                }`}
+                title="Collapse Sidebar"
+              >
+                <ChevronLeft size={18} />
+              </button>
+            )}
           </div>
 
           {/* Navigation */}
