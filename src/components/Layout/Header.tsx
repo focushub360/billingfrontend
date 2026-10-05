@@ -53,27 +53,7 @@ export const Header = ({
               </button>
             )}
 
-            <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-              <div
-                className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base flex-shrink-0"
-                style={{ backgroundColor: colors.primary.medium }}
-              >
-                C
-              </div>
-              <div className="min-w-0 flex-1">
-                <h1 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white truncate">
-                  <span className="hidden sm:inline">BILLING SOFTWARE</span>
-                  <span className="sm:hidden">
-                    {user?.role === "admin" ? "Admin" : "Manager"}
-                  </span>
-                </h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
-                  {user?.role === "admin"
-                    ? "Only for Administration Purpose"
-                    : "Manager Dashboard"}
-                </p>
-              </div>
-            </div>
+
           </div>
 
           {/* Right section - Admin info and controls */}
